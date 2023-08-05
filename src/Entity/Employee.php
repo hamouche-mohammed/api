@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EmployeeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,6 +33,14 @@ class Employee
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
+
+    #[ORM\OneToMany(mappedBy: 'employee_id', targetEntity: Robot::class)]
+    private Collection $robots;
+
+    public function __construct()
+    {
+        $this->robots = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -105,6 +115,36 @@ class Employee
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Robot>
+     */
+    public function getRobots(): Collection
+    {
+        return $this->robots;
+    }
+
+    public function addRobot(Robot $robot): static
+    {
+        if (!$this->robots->contains($robot)) {
+            $this->robots->add($robot);
+            $robot->setEmployeeId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRobot(Robot $robot): static
+    {
+        if ($this->robots->removeElement($robot)) {
+            // set the owning side to null (unless already changed)
+            if ($robot->getEmployeeId() === $this) {
+                $robot->setEmployeeId(null);
+            }
+        }
 
         return $this;
     }

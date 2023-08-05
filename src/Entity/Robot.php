@@ -29,6 +29,12 @@ class Robot
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
+    #[ORM\ManyToOne(inversedBy: 'robots')]
+    private ?Model $model_id = null;
+
+    #[ORM\ManyToOne(inversedBy: 'robots')]
+    private ?Employee $employee_id = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +96,30 @@ class Robot
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getModelId(): ?Model
+    {
+        return $this->model_id;
+    }
+
+    public function setModelId(?Model $model_id): static
+    {
+        $this->model_id = $model_id;
+
+        return $this;
+    }
+
+    public function getEmployeeId(): ?Employee
+    {
+        return $this->employee_id;
+    }
+
+    public function setEmployeeId(?Employee $employee_id): static
+    {
+        $this->employee_id = $employee_id;
 
         return $this;
     }

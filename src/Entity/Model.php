@@ -37,9 +37,13 @@ class Model
     #[ORM\ManyToMany(targetEntity: Component::class, inversedBy: 'models')]
     private Collection $components;
 
+    #[ORM\OneToMany(mappedBy: 'model_id', targetEntity: Robot::class)]
+    private Collection $robots;
+
     public function __construct()
     {
         $this->components = new ArrayCollection();
+        $this->robots = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -139,6 +143,36 @@ class Model
     public function removeComponent(Component $component): static
     {
         $this->components->removeElement($component);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Robot>
+     */
+    public function getRobots(): Collection
+    {
+        return $this->robots;
+    }
+
+    public function addRobot(Robot $robot): static
+    {
+        if (!$this->robots->contains($robot)) {
+            $this->robots->add($robot);
+            $robot->setModelId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRobot(Robot $robot): static
+    {
+        if ($this->robots->removeElement($robot)) {
+            // set the owning side to null (unless already changed)
+            if ($robot->getModelId() === $this) {
+                $robot->setModelId(null);
+            }
+        }
 
         return $this;
     }
